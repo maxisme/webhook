@@ -85,6 +85,7 @@ func CreateConfHandler(conf WebhookConfig) func(w http.ResponseWriter, r *http.R
 
 		// run command
 		c := exec.Command(executable, splitCmds[1:]...)
+		log.Println("Running: " + c.String())
 		out, err := c.CombinedOutput()
 		if err != nil {
 			writeError(w, string(out)+" "+err.Error(), http.StatusInternalServerError)
