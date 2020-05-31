@@ -103,7 +103,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer watcher.Close()
 
 	// web server
 	go func() {
