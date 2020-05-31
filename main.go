@@ -4,15 +4,16 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/fsnotify/fsnotify"
-	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
-	"gopkg.in/validator.v2"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os/exec"
 	"strings"
+
+	"github.com/fsnotify/fsnotify"
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
+	"gopkg.in/validator.v2"
 )
 
 const configPath = "./config.json"
