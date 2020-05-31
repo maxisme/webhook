@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os/exec"
 	"strings"
+	"time"
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/go-chi/chi"
@@ -114,6 +115,7 @@ func main() {
 			configs, err := ConfigFromPath(configPath)
 			if err != nil {
 				log.Println(err)
+				time.Sleep(10 * time.Second)
 			} else {
 				// add handlers from config
 				for endpoint, conf := range configs {
