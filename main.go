@@ -8,12 +8,12 @@ import (
 	"log"
 	"net/http"
 	"os/exec"
-	"strings"
 	"time"
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"github.com/google/shlex"
 	"gopkg.in/validator.v2"
 )
 
@@ -112,7 +112,10 @@ func CreateConfHandler(conf WebhookConfig) func(w http.ResponseWriter, r *http.R
 }
 
 func runCmd(cmd string) ([]byte, error) {
-	splitCmds := strings.Split(cmd, " ")
+	splitCmds, err := shlex.Split(cmd)
+	if err != nil {
+		return nil, err
+	}
 
 	// validate executable
 	executable, err := exec.LookPath(splitCmds[0])
