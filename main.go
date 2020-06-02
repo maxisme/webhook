@@ -64,7 +64,7 @@ func CreateConfHandler(conf WebhookConfig) func(w http.ResponseWriter, r *http.R
 		}
 
 		if r.Form.Get("token") != conf.Token {
-			log.Println("Invalid token!")
+			log.Printf("Invalid token! '%s'\n", r.Form.Get("token"))
 			return
 		}
 
