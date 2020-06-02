@@ -84,7 +84,6 @@ func CreateConfHandler(conf WebhookConfig) func(w http.ResponseWriter, r *http.R
 			go func() {
 				for _, cmd := range conf.Cmds {
 					c := fmt.Sprintf(cmd, args...)
-					log.Println("Running: " + c)
 					_, err := runCmd(c)
 					if err != nil {
 						log.Println(err.Error())
@@ -94,7 +93,6 @@ func CreateConfHandler(conf WebhookConfig) func(w http.ResponseWriter, r *http.R
 		} else {
 			for _, cmd := range conf.Cmds {
 				c := fmt.Sprintf(cmd, args...)
-				log.Println("Running: " + c)
 				out, err := runCmd(c)
 				if err != nil {
 					writeError(w, err.Error(), http.StatusInternalServerError)
@@ -125,6 +123,7 @@ func runCmd(cmd string) ([]byte, error) {
 
 	// run command
 	c := exec.Command(executable, splitCmds[1:]...)
+	log.Println("Running: " + c.String())
 	out, err := c.CombinedOutput()
 	if err != nil {
 		return nil, errors.New(string(out) + " " + err.Error())
