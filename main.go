@@ -73,7 +73,7 @@ func CreateConfHandler(conf WebhookConfig) func(w http.ResponseWriter, r *http.R
 		for _, arg := range conf.Args {
 			argVal := r.Form.Get(arg)
 			if argVal == "" {
-				writeError(w, "Missing argument: "+argVal, http.StatusBadRequest)
+				writeError(w, "Missing argument: "+arg, http.StatusBadRequest)
 				return
 			}
 			args = append(args, argVal)
