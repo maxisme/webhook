@@ -99,7 +99,7 @@ func CreateConfHandler(conf WebhookConfig) func(w http.ResponseWriter, r *http.R
 
 		_, err = w.Write(out)
 		if err != nil {
-			writeError(w, err.Error(), http.StatusBadRequest)
+			writeError(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 	}
