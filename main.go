@@ -21,9 +21,10 @@ const configPath = "./config.json"
 
 type endpoint = string
 type WebhookConfig struct {
-	Cmd   string   `json:"cmd" validate:"nonzero"`
+	Cmds  []string `json:"cmds" validate:"nonzero"`
 	Token string   `json:"token" validate:"min=20"`
 	Args  []string `json:"args"`
+	Async bool     `json:"async"`
 }
 
 func writeError(w http.ResponseWriter, err string, code int) {
@@ -68,7 +69,7 @@ func CreateConfHandler(conf WebhookConfig) func(w http.ResponseWriter, r *http.R
 			return
 		}
 
-		// parse form arguments into command
+		// get form params from arguments
 		var args []interface{}
 		for _, arg := range conf.Args {
 			argVal := r.Form.Get(arg)
@@ -78,31 +79,54 @@ func CreateConfHandler(conf WebhookConfig) func(w http.ResponseWriter, r *http.R
 			}
 			args = append(args, argVal)
 		}
-		cmd := fmt.Sprintf(conf.Cmd, args...)
 
-		// validate executable
-		splitCmds := strings.Split(cmd, " ")
-		executable, err := exec.LookPath(splitCmds[0])
-		if err != nil {
-			writeError(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+		if conf.Async {
+			go func() {
+				for _, cmd := range conf.Cmds {
+					c := fmt.Sprintf(cmd, args...)
+					log.Println("Running: " + c)
+					_, err := runCmd(c)
+					if err != nil {
+						log.Println(err.Error())
+					}
+				}
+			}()
+		} else {
+			for _, cmd := range conf.Cmds {
+				c := fmt.Sprintf(cmd, args...)
+				log.Println("Running: " + c)
+				out, err := runCmd(c)
+				if err != nil {
+					writeError(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
 
-		// run command
-		c := exec.Command(executable, splitCmds[1:]...)
-		log.Println("Running: " + c.String())
-		out, err := c.CombinedOutput()
-		if err != nil {
-			writeError(w, string(out)+" "+err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		_, err = w.Write(out)
-		if err != nil {
-			writeError(w, err.Error(), http.StatusInternalServerError)
-			return
+				_, err = w.Write(out)
+				if err != nil {
+					writeError(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+			}
 		}
 	}
+}
+
+func runCmd(cmd string) ([]byte, error) {
+	splitCmds := strings.Split(cmd, " ")
+
+	// validate executable
+	executable, err := exec.LookPath(splitCmds[0])
+	if err != nil {
+		return nil, err
+	}
+
+	// run command
+	c := exec.Command(executable, splitCmds[1:]...)
+	out, err := c.CombinedOutput()
+	if err != nil {
+		return nil, errors.New(string(out) + " " + err.Error())
+	}
+	return out, nil
 }
 
 func main() {
