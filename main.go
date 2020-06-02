@@ -71,7 +71,12 @@ func CreateConfHandler(conf WebhookConfig) func(w http.ResponseWriter, r *http.R
 		// parse form arguments into command
 		var args []interface{}
 		for _, arg := range conf.Args {
-			args = append(args, r.Form.Get(arg))
+			argVal := r.Form.Get(arg)
+			if argVal == "" {
+				writeError(w, "Missing argument: "+argVal, http.StatusInternalServerError)
+				return
+			}
+			args = append(args, argVal)
 		}
 		cmd := fmt.Sprintf(conf.Cmd, args...)
 
