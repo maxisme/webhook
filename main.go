@@ -81,6 +81,7 @@ func CreateConfHandler(conf WebhookConfig) func(w http.ResponseWriter, r *http.R
 		}
 
 		if conf.Async {
+			// run commands in go routines
 			go func() {
 				for _, cmd := range conf.Cmds {
 					c := fmt.Sprintf(cmd, args...)
@@ -95,6 +96,7 @@ func CreateConfHandler(conf WebhookConfig) func(w http.ResponseWriter, r *http.R
 				c := fmt.Sprintf(cmd, args...)
 				out, err := runCmd(c)
 				if err != nil {
+					log.Println(err.Error())
 					writeError(w, err.Error(), http.StatusInternalServerError)
 					return
 				}
