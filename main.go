@@ -151,6 +151,7 @@ func main() {
 			} else {
 				// add handlers from config
 				for endpoint, conf := range configs {
+					log.Println("Added: " + endpoint)
 					r.HandleFunc(endpoint, CreateConfHandler(conf))
 				}
 				r.HandleFunc("/health", func(writer http.ResponseWriter, request *http.Request) {})
