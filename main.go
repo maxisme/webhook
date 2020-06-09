@@ -13,7 +13,6 @@ import (
 	"github.com/fsnotify/fsnotify"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-	"github.com/google/shlex"
 	"gopkg.in/validator.v2"
 )
 
@@ -112,20 +111,8 @@ func CreateConfHandler(conf WebhookConfig) func(w http.ResponseWriter, r *http.R
 }
 
 func runCmd(cmd string) ([]byte, error) {
-	splitCmds, err := shlex.Split(cmd)
-	if err != nil {
-		return nil, err
-	}
-
-	// validate executable
-	executable, err := exec.LookPath(splitCmds[0])
-	if err != nil {
-		return nil, err
-	}
-
 	// run command
-	c := exec.Command(executable, splitCmds[1:]...)
-	log.Printf("Running: %v\n%s \n", splitCmds, c.String())
+	c := exec.Command("/bin/sh", "-c", cmd)
 	out, err := c.CombinedOutput()
 	if err != nil {
 		return nil, errors.New(string(out) + " " + err.Error())
