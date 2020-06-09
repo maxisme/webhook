@@ -113,6 +113,7 @@ func CreateConfHandler(conf WebhookConfig) func(w http.ResponseWriter, r *http.R
 func runCmd(cmd string) ([]byte, error) {
 	// run command
 	c := exec.Command("/bin/sh", "-c", cmd)
+	log.Println("Running: " + c.String())
 	out, err := c.CombinedOutput()
 	if err != nil {
 		return nil, errors.New(string(out) + " " + err.Error())
