@@ -125,7 +125,7 @@ func runCmd(cmd string) ([]byte, error) {
 
 	// run command
 	c := exec.Command(executable, splitCmds[1:]...)
-	log.Println("Running: " + c.String())
+	log.Printf("Running: %v\n%s \n", splitCmds, c.String())
 	out, err := c.CombinedOutput()
 	if err != nil {
 		return nil, errors.New(string(out) + " " + err.Error())
